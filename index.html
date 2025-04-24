@@ -1,7 +1,3 @@
----
-layout: none
----
-
 <!doctype html>
 <html lang="ru">
 
@@ -36,20 +32,55 @@ layout: none
 
 <body>
     <h1>Список отчётов</h1>
-    <ul>
-        {% assign reports = site.pages
-        | where_exp: "p", "p.name != 'index.html'" %}
-        {% for page in reports %}
-        <li>
-            <a href="{{ page.url }}" target="_blank">
-                {{ page.name | remove: ".html" }}
-            </a>
-        </li>
-        {% endfor %}
-        {% if reports == empty %}
-        <li>Отчётов не найдено</li>
-        {% endif %}
+    <ul id="reports-list">
+        <li>Загрузка списка отчетов...</li>
     </ul>
+
+    <script>
+        let reportFiles = []; // Инициализируем пустой массив
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const reportsList = document.getElementById('reports-list');
+
+            // Функция загрузки данных из index.json
+            async function loadReportFiles() {
+                try {
+                    const response = await fetch('reports/index.json');
+                    if (!response.ok) {
+                        throw new Error(`Ошибка HTTP: ${response.status}`);
+                    }
+                    reportFiles = await response.json();
+                    displayReports();
+                } catch (error) {
+                    console.error('Ошибка загрузки index.json:', error);
+                    reportsList.innerHTML = '<li>Ошибка загрузки списка отчетов</li>';
+                }
+            }
+
+            function displayReports() {
+                if (!reportFiles || reportFiles.length === 0) {
+                    reportsList.innerHTML = '<li>Отчётов не найдено</li>';
+                    return;
+                }
+
+                reportsList.innerHTML = '';
+                reportFiles.forEach(file => {
+                    if (!file.name.endsWith('.html')) return;
+
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `reports/${file.name}`;
+                    a.target = '_blank';
+                    a.textContent = file.name.replace('.html', '');
+                    li.appendChild(a);
+                    reportsList.appendChild(li);
+                });
+            }
+
+            // Вызываем загрузку данных
+            loadReportFiles();
+        });
+    </script>
 </body>
 
 </html>
