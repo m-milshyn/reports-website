@@ -7,15 +7,15 @@ on:
     branches: [ main ]
 
 permissions:
-  pages: write
-  id-token: write
+  pages: write        # для деплоя
+  id-token: write     # для deploy-pages
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Build site with Jekyll (Docker)
