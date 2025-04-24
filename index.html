@@ -37,16 +37,14 @@ layout: none
 <body>
     <h1>Список отчётов</h1>
     <ul>
-        {% assign reports = site.static_files
-        | where_exp: "f", "f.relative_path contains '/reports/'" %}
-        {% for f in reports %}
-        {% if f.extname == ".html" and f.name != "index.html" %}
+        {% assign reports = site.pages
+        | where_exp: "p", "p.name != 'index.html'" %}
+        {% for page in reports %}
         <li>
-            <a href="{{ f.relative_path }}" target="_blank">
-                {{ f.name | remove: ".html" }}
+            <a href="{{ page.url }}" target="_blank">
+                {{ page.name | remove: ".html" }}
             </a>
         </li>
-        {% endif %}
         {% endfor %}
         {% if reports == empty %}
         <li>Отчётов не найдено</li>
