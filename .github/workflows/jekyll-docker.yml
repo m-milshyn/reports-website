@@ -1,54 +1,37 @@
-name: Jekyll site CI & Deploy
+name: Build & Deploy Jekyll site
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 permissions:
   contents: read
-  pages: write        # для деплоя
-  id-token: write     # для deploy-pages
+  pages: write
+  id-token: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build site with Jekyll (Docker)
+      - name: Prepare _site and cache dirs
         run: |
-          mkdir -p _site
-          docker run --rm \
-            -v ${{ github.workspace }}:/srv/jekyll \
-            -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
-            jekyll/jekyll:4 \
-            jekyll build --destination /srv/jekyll/_site --future
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+          mkdir -p _site .jekyll-cache
+          chmod -R 777 _site .jekyll-cache
 
       - name: Build site with Jekyll (Docker)
         run: |
-          mkdir -p _site
           docker run --rm \
             -v ${{ github.workspace }}:/srv/jekyll \
             -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
+            -v ${{ github.workspace }}/.jekyll-cache:/srv/jekyll/.jekyll-cache \
             jekyll/jekyll:4 \
-            jekyll build --destination /srv/jekyll/_site --future
+            jekyll build \
+              --destination /srv/jekyll/_site \
+              --future
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
