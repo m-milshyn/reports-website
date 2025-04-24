@@ -17,6 +17,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Update reports index.json
+        run: node scripts/update-index.js
+
       - name: Prepare _site and cache dirs
         run: |
           mkdir -p _site .jekyll-cache
