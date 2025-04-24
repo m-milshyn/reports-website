@@ -2,9 +2,9 @@ name: Jekyll site CI & Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 permissions:
   pages: write
@@ -15,12 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build site with Jekyll Docker
+      - name: Build site with Jekyll (Docker)
         run: |
-          # создаём папку для артефакта
           mkdir -p _site
           docker run --rm \
             -v ${{ github.workspace }}:/srv/jekyll \
@@ -28,7 +27,7 @@ jobs:
             jekyll/jekyll:4 \
             jekyll build --destination /srv/jekyll/_site --future
 
-      - name: Upload _site
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: _site
